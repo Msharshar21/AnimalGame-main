@@ -30,7 +30,7 @@ public class Game {
                 player.healthDecrease();
                 if (player.playerAnimals.isEmpty() && player.getPlayerBudget() <= 0){
                     playerBox.remove(player);
-                    System.out.println("\n "+player.getPlayerName() + "s Turn ");
+                    System.out.println("\n "+player.getPlayerName() + " has been eliminated.");
                 }
             }
 

@@ -212,7 +212,6 @@ public class Menu {
                 case 4 -> foodInStack = seed;
                 case 5 -> foodInStack = vegetables;
                 default -> foodInStack = none;
-
             }
 
             switch (parseInt(fedAnimal)) {
@@ -223,11 +222,17 @@ public class Menu {
                 default -> System.out.println("Not valid!\n");
             }
 
+            foodStack = parseInt(foodAmount);
+
         } catch (NumberFormatException ne) {
             System.out.println("This is not even a number\n");
+            return;
         }
 
-        foodStack = parseInt(foodAmount);
+        if (feedingAnimal == null || foodInStack == null) {
+            System.out.println("Invalid choice, please try again.\n");
+            return;
+        }
 
         if (foodStack > player.getPlayerFood(foodInStack)) {
             System.out.println("Not valid with no food.");
@@ -235,33 +240,31 @@ public class Menu {
         } else {
             CopyOnWriteArrayList<Animal> playersAnimals = player.getAnimalArray();
             while (foodStack > 0) {
+                boolean fedAnAnimal = false;
                 for (Animal individual : playersAnimals) {
-                    assert feedingAnimal != null;
+                    if (foodStack <= 0) break; // stop iterating once all food is used
                     if (individual.getType().equals(feedingAnimal.getType())) {
                         String pickyEater = String.valueOf(individual.getDiet());
-
                         String currentServed = String.valueOf(foodInStack.getType());
                         if (pickyEater.contains(currentServed)) {
-                            if (individual.getHealth() > 100) {
-                                individual.setHealth(100);
-                            } else {
+                            if (individual.getHealth() < 100) {
                                 int healingfromfood = foodInStack.getHealthBoost() * individual.getFoodBoost();
                                 int individualhealth = individual.getHealth();
                                 individual.setHealth((individualhealth + healingfromfood));
                                 player.removePlayerFood(foodInStack);
                                 foodStack = foodStack - 1;
+                                fedAnAnimal = true;
                                 System.out.println(individual.getName() + " the " + individual.getType() +
                                         " ate of " +  foodInStack.getType().toString().toLowerCase() +
                                         ", new health is " +  individual.getHealth());
                             }
                         } else {
-                            System.out.println("Invalid choice.");
-                            foodStack = 0;
-                            feedAnimal(player);
+                            System.out.println("This food is not compatible with this animal's diet.");
+                            return;
                         }
-
                     }
                 }
+                if (!fedAnAnimal) break;
             }
         }
     }
@@ -286,6 +289,11 @@ public class Menu {
             case 3 -> animalMate = dog;
             case 4 -> animalMate = cow;
             default -> System.out.println("Not valid\n");
+        }
+
+        if (animalMate == null) {
+            System.out.println("Not a valid animal choice.\n");
+            return;
         }
 
         ArrayList<Animal> singletype = new ArrayList<>();
@@ -339,7 +347,7 @@ public class Menu {
             }
         }
         for (Animal animalID : markedSold) {
-            store.sellAnimal(player, playerInventory.get(markedSold.indexOf(animalID)));
+            store.sellAnimal(player, animalID);
         }
     }
 
